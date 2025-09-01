@@ -11,7 +11,7 @@ import SwiftUI
 struct EndlessGalleryApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            RandomPhotosView()
         }
     }
 }
