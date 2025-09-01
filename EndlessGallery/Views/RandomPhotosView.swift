@@ -9,46 +9,7 @@ struct RandomPhotosView: View {
         NavigationView {
                 VStack {
                     toggleButton
-                    Group {
-                        if viewModel.isLoading {
-                            progressView
-                        } else if let error = viewModel.errorMessage {
-                            errorText(error:error)
-                        } else {
-                            ScrollView {
-                                if singleColumn{
-                                    singleColumnView(width: geometry.size.width*0.97, height: geometry.size.height*0.40)
-                                }
-                                else{
-                                    let columns = [
-                                       GridItem(.flexible(), spacing: 12),
-                                       GridItem(.flexible(), spacing: 12)
-                                   ]
-                                    LazyVGrid(columns: columns, spacing: 8) {
-                                        ForEach(viewModel.photos.indices, id: \.self) { index in
-                                            let photo = viewModel.photos[index]
-                                            gridItem(
-                                                photo: photo,
-                                                width: (geometry.size.width / 2) - 20,
-                                                height: geometry.size.height * 0.30
-                                            )
-                                            .onAppear {
-                                                if index == viewModel.photos.count - 1 {
-                                                    currentPage += 1
-                                                    viewModel.fetchPhotos(page: currentPage)
-                                                }
-                                            }
-                                        }
-                                    }
-                                    .padding(.horizontal)
-                                }
-                            }
-                            .refreshable {
-                                currentPage = 1
-                                viewModel.fetchPhotos(page: currentPage)
-                            }
-                        }
-                    }
+                    randomPhotosBody(geometry:geometry)
                     PaginationBottomBar
                 }
                 .navigationTitle("Gallery")
@@ -60,6 +21,52 @@ struct RandomPhotosView: View {
             }
         }
     }
+    
+    private func randomPhotosBody(geometry: GeometryProxy) -> some View{
+        Group{
+        if viewModel.isLoading {
+                progressView
+            } else if let error = viewModel.errorMessage {
+                errorText(error:error)
+            } else {
+                ScrollView {
+                    if singleColumn{
+                        singleColumnView(width: geometry.size.width*0.97, height: geometry.size.height*0.40)
+                    }
+                    else{
+                        let columns = [
+                           GridItem(.flexible(), spacing: 12),
+                           GridItem(.flexible(), spacing: 12)
+                       ]
+                        LazyVGrid(columns: columns, spacing: 8) {
+                            ForEach(viewModel.photos.indices, id: \.self) { index in
+                                let photo = viewModel.photos[index]
+                                gridItem(
+                                    photo: photo,
+                                    width: (geometry.size.width / 2) - 20,
+                                    height: geometry.size.height * 0.30
+                                )
+                                .onAppear {
+                                    if index == viewModel.photos.count - 1 {
+                                        currentPage += 1
+                                        viewModel.fetchPhotos(page: currentPage)
+                                    }
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                }
+                .refreshable {
+                    currentPage = 1
+                    viewModel.fetchPhotos(page: currentPage)
+                }
+            }
+        }
+    }
+    
+    
+    
     
     private var toggleButton: some View {
         Toggle("Single Column", isOn: $singleColumn)
